@@ -1,5 +1,3 @@
-# DevOps
-
 # March 18th
 
 # DevOps  [**To know more about DevOps click upon me :)**](https://about.gitlab.com/topics/devops/#dev-ops-defined)
@@ -712,3 +710,269 @@ npm run test
     - Configuring Self Hosted Agents
     - Learning to write basic pipelines in yaml
 - Exercise: [YAML and JSON](https://www.youtube.com/watch?v=ggOmHlnhPaM&list=PLuVH8Jaq3mLud3sVDvJ-gJ__0zd15wGDd&index=15)
+
+# April 7th
+
+## Azure Pipelines
+
+- Azure Pipelines are written in YAML Format.
+- YAML is a data representation format with key value (name value) pairs as it basic structure.
+
+- The tool will define th structure
+    - [Azure DevOps](https://learn.microsoft.com/en-us/azure/devops/pipelines/yaml-schema/?view=azure-pipelines)
+    - [K8s](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/)
+    - [Compose](https://docs.docker.com/reference/compose-file/)
+- YAML represents data in name value
+- name: <value>
+
+- Values can be of following types
+    - text
+    - number
+    - boolean
+    - list/array
+    - map/object
+- Text
+```
+title: Court
+title: "Court"
+title: 'Court'
+```
+
+- numbers
+```
+duration: 149
+rating: 9.5
+```
+
+- boolean
+```
+imax: false
+imax: no
+```
+
+- list or array
+```
+cast: ["Priyadarshi", "Harsh", "Shivaji"]
+cast:
+- Priyadarshi
+- Harsh
+- Shivaji
+```
+
+- map/dictionary/object:
+- Crew:
+```
+  director: Ram Jagadeesh
+  producer: Nani
+  music: Vijay
+```
+
+- complete yaml
+---
+title: Court
+duration: 149
+rating: 9.5
+imaxEnabled: no
+Cast:
+  - Priyadarshi
+  - Harsh
+  - Shivaji
+Crew:
+  director: Ram Jagadeesh
+  producer: Nani
+  music: Vijay
+
+- Lets write about one more movie in the same yaml
+---
+title: Court
+duration: 149
+rating: 9.5
+imaxEnabled: no
+Cast:
+  - Priyadarshi
+  - Harsh
+  - Shivaji
+Crew:
+  director: Ram Jagadeesh
+  producer: Nani
+  music: Vijay
+---
+title: Chhaava
+duration: 161
+rating: 9.2
+imaxEnabled: no
+Cast:
+  - Vicky
+  - Rashmika
+  - Akshay
+Crew:
+  director: Laxman Utekar
+  producer: Dinesh Vijan
+  music: A.R Rehman
+
+- If we want some one to fill the movie we define fields and types
+```
+title: <text>
+duration: <number>
+ratings: <number>
+imaxEnabled: <boolean>
+Cast: text array | list<text> | list<string>
+Crew: <Crew>
+
+Crew:
+director: <text>
+producer: <text>
+music: <text>
+```
+
+### Understanding Azure DevOps Pipeline Concepts
+- pipeline structure (First Version)
+
+![image](https://github.com/user-attachments/assets/2346458b-4d86-47da-b692-fdc0d427a2fd)
+
+- An Agent i.e. a machine to build can be chosen at
+    - Pipeline
+    - Stage
+    - Job
+![image](https://github.com/user-attachments/assets/dcb2435d-10b0-44e3-979c-482a2f817926)
+
+- To Simplify the pipeline
+    - If your pipeline has one stage and muliple jobs, then represent pipeline has set of jobs
+    - If your pipeline has one stage, one job and multiple steps, then represent pipeline as set of steps
+
+#### Lets create our first dummy pipeline
+- Lets create a pipeline which runs on microsoft hosted agent which will have Windows OS
+- It will have 3 stages
+    - Build
+    - It will have 1 jobs
+        - build the code
+    - System Test
+        - It will have 1 job which starts the selenium tests
+    - Deploy
+        - It will have 1 job which runs the terraform
+- Pool defines the agents. Check for [agent names](https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/hosted?view=azure-devops&tabs=yaml#software)
+- This is dummy as it will only print the value but not execute
+
+---
+name: dummy
+pool: windows-2022
+stages:
+- stage: build
+  jobs:
+  - job: build
+    steps:
+    - script: echo Building
+- stage: test
+  jobs:
+  - job: test
+    steps:
+    - script: echo testing
+- stage: deploy
+  jobs:
+  - job: deploy
+    steps:
+    - script: echo deploying
+I have one stage, one job and 3 steps
+---
+name: dummy
+pool: ubuntu-latest
+steps:
+- script: echo step1
+- script: echo step2
+- script: echo step3
+
+
+- Pipeline generated in last session
+- trigger: 
+    - main
+- pool:
+    - vmImage: ubuntu-latest
+
+- steps:
+- task: Maven@3
+``` 
+inputs:
+    mavenPomFile: 'pom.xml'
+    mavenOptions: '-Xmx3072m'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.17'
+    jdkArchitectureOption: 'x64'
+    publishJUnitResults: true
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'
+    goals: 'package'
+```
+
+# April 8
+
+## Configuring Self hosted Agent in Azure DevOps
+- [Refer Here](https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/linux-agent?view=azure-devops&tabs=IP-V4) for self hosted linux agents
+
+## Lets create an Ubuntu 24.04 Agent
+- Softwares:
+    - Openjdk
+    - Maven
+
+- Azure DevOps Agent Setup:
+    - This requires a PAT (Personal Access Token)
+
+![image](https://github.com/user-attachments/assets/c5e5f8bc-bd69-4479-8534-7c01b8c03b34)
+
+
+### Activity
+- Lets create a pipeline to build the maven project
+- [Azure Devops YAML Schema](https://learn.microsoft.com/en-us/azure/devops/pipelines/yaml-schema/?view=azure-pipelines)
+- Generic Pipeline:
+    - When to run
+    - What has to be executed
+    - Where it has to run
+    - metadata
+- In Azure DevOps Pipelines
+    - What is decided by steps
+    - Where is decided by pool section
+    - when is decided by triggers
+- Manual step
+```
+git clone <url>
+cd <folder>
+mvn package
+```
+- When: whenver any change is pushed to main branch
+- Where: ON a self hosted agent
+- [Refer Here](https://github.com/dummyrepos/Spc-ado-march25/commit/721e681e4259e7593302d2f1a1a1c38db15219cb) for the first pipeline
+
+```
+name: spring-pet-clinic
+name: spring-pet-clinic
+
+trigger:
+  - main
+
+pool: Default
+
+steps:
+  - script: ./mvnw clean package
+Lets try using Task
+
+name: spring-pet-clinic
+
+trigger:
+  - main
+
+pool: Default
+
+steps:
+  - task: Maven@4
+    displayName: Maven Build
+    inputs:
+      mavenPOMFile: 'pom.xml'
+      goals: 'package'
+      testResultsFiles: '**/surefire-reports/TEST-*.xml'
+```
+
+- [Refer Here](https://github.com/dummyrepos/Spc-ado-march25/commit/ddcd0c09c90439ca8514d2c73190913d83b936c4) for the changes with task
+
+### Azure DevOps Steps
+- A step is an activity in azure devops pipeline.
+- [Azure DevOps Steps types](https://learn.microsoft.com/en-us/azure/devops/pipelines/yaml-schema/steps?view=azure-pipelines#list-types)
+- [Azure DevOps Tasks](https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/?view=azure-pipelines)
+
